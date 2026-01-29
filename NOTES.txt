@@ -9,3 +9,61 @@
     lsof -i :8000,
     kill -9 (port number)
 
+
+
+Notes and project workflow:
+Day 1 Frontend:
+    - Created react project inside frontend directory
+Day 1 Backend:
+    - Created folder structure for backend
+    - Added __init__.py files where needed (__init__.py tells Python that a folder is a package and controls what gets imported from it.)
+    - Created virtual enviornment and downloaded packages needed -- added all dependencies to requirements.txt
+    - Created Auth headers
+        - Staging require an http basic auth to avoid search engine indexing. The username is off, and the password off. (This sentence is from OpenFoodsAPI docs)
+        - username = "off", password = "off"
+        - Utilized requests.auth "HTTPBasicAuth" module 
+            - basic_auth = HTTPBasicAuth(username, password)
+    - Initialized main.py and foods.py
+        - main.py starts FastAPI and defines API routes.
+        - foods.py handles food data logic and calls OpenFoodFacts.
+        - main.py passes barcode values to foods.py functions.
+        - foods.py fetches and processes the product data.
+        - main.py returns the data to the client as JSON.
+        - Separation keeps routing and business logic organized.
+                    [User / Frontend]
+                    |
+                    |  HTTP GET request to /product/{barcode}
+                    v
+            -------------------------
+            |       main.py         |
+            |-----------------------|
+            | - Receives request    |
+            | - Extracts 'barcode'  |
+            | - Calls function in   |
+            |   foods.py with code  |
+            -------------------------
+                    |
+                    v
+            -------------------------
+            |       foods.py        |
+            |-----------------------|
+            | - Receives barcode    |
+            | - Calls OpenFoodFacts |
+            |   API to get product  |
+            | - Processes response  |
+            | - Returns product     |
+            |   data back to main.py|
+            -------------------------
+                    |
+                    v
+            -------------------------
+            |       main.py         |
+            |-----------------------|
+            | - Receives data       |
+            | - Returns JSON        |
+            |   response to user    |
+            -------------------------
+                    |
+                    v
+            [User / Frontend]
+
