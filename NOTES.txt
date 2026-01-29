@@ -10,7 +10,6 @@
     kill -9 (port number)
 
 
-
 Notes and project workflow:
 Day 1 Frontend:
     - Created react project inside frontend directory
@@ -18,12 +17,14 @@ Day 1 Backend:
     - Created folder structure for backend
     - Added __init__.py files where needed (__init__.py tells Python that a folder is a package and controls what gets imported from it.)
     - Created virtual enviornment and downloaded packages needed -- added all dependencies to requirements.txt
+    - Utilized OpenFoodFacts API (no API key needed) - just make requests to their URL.
+        - Reference - https://openfoodfacts.github.io/openfoodfacts-server/api/
     - Created Auth headers
         - Staging require an http basic auth to avoid search engine indexing. The username is off, and the password off. (This sentence is from OpenFoodsAPI docs)
         - username = "off", password = "off"
         - Utilized requests.auth "HTTPBasicAuth" module 
             - basic_auth = HTTPBasicAuth(username, password)
-    - Initialized main.py and foods.py
+    - Initialized main.py and foods.py for OpenFoodFacts API
         - main.py starts FastAPI and defines API routes.
         - foods.py handles food data logic and calls OpenFoodFacts.
         - main.py passes barcode values to foods.py functions.
@@ -67,3 +68,57 @@ Day 1 Backend:
                     v
             [User / Frontend]
 
+
+-----------------------------------------------------------------------------------------------------------------------------
+Day 2 Backend:
+    - Utilized Food data central's API 
+        - Reference - https://fdc.nal.usda.gov/api-guide#bkmk-7
+    - Created functions in foods.py, and main.py to support API calls to Food Data Central
+    - Utilized HTTPBasicAuth to set up headers by passing the X-API-Key, and a empty password ""
+                                            [User / Frontend]
+                            |
+                            |  HTTP GET request to /foods/search?query=apple
+                            v
+                    -------------------------
+                    |       main.py         |
+                    |-----------------------|
+                    | - Receives request    |
+                    | - Extracts 'query'    |
+                    | - Calls function in   |
+                    |   foods.py with query |
+                    -------------------------
+                            |
+                            v
+                    -------------------------
+                    |       foods.py        |
+                    |-----------------------|
+                    | - Receives query      |
+                    | - Calls FoodData      |
+                    |   Central API (/v1/foods/search) |
+                    |   with query, pageSize, dataType |
+                    | - Processes response: |
+                    |     - Extracts 'foods' list    |
+                    |     - For each food:           |
+                    |         - fdcId                |
+                    |         - description          |
+                    |         - Simplifies nutrients |
+                    |           to only name & value |
+                    | - Returns list of simplified   |
+                    |   food dictionaries back to    |
+                    |   main.py                      |
+                    -------------------------
+                            |
+                            v
+                    -------------------------
+                    |       main.py          |
+                    |----------------------- |
+                    | - Receives simplified  |
+                    |   list of foods        |
+                    | - Optionally formats   |
+                    |   (e.g., fdcId + desc) |
+                    | - Returns JSON         |
+                    |   response to user     |
+                    -------------------------
+                            |
+                            v
+                    [User / Frontend]
