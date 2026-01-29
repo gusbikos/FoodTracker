@@ -1,0 +1,11 @@
+-- Copy and paste commands --
+
+1. Start virtual env
+    python3 -m venv venv,
+    source venv/bin/activate,
+    deactivate  
+
+2. Kill FastAPI port 
+    lsof -i :8000,
+    kill -9 (port number)
+

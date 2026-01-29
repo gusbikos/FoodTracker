@@ -1,0 +1,8 @@
+Backend: 
+    Search foods
+    Scan barcodes
+    Track meals
+    Calculate calories & macros
+    Show daily & weekly summaries
+    Predict weight change
+    Scale to real users
