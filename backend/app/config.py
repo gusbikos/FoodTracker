@@ -21,4 +21,4 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-FOOD_FACTS_API_KEY = os.getenv("FOOD_FACTS_API_KEY")
+FOOD_DATA_CENTRAL_API_KEY = os.getenv("FOOD_DATA_CENTRAL_API_KEY")

@@ -12,13 +12,9 @@ Responsibilities:
 from typing import Union
 
 from fastapi import FastAPI, HTTPException
-from app.api.foods import get_food_product_barcode
+from app.api.foods import get_food_product_barcode, search_foods
 
 app = FastAPI()
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
 
 @app.get("/product/{code}")
 def get_products_barcode(code):
@@ -29,4 +25,14 @@ def get_products_barcode(code):
             detail="Product not found"
         )
     return data
+
+@app.get("/foods/search")
+def get_food_item(query):
+    foods_list = search_foods(query)
+    if not foods_list:
+        raise HTTPException(
+            status_code=404,
+            detail="Foods not found"
+        )
+    return foods_list
 
