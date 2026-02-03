@@ -1,13 +1,19 @@
 -- Copy and paste commands --
 
 1. Start virtual env
-    python3 -m venv venv,
-    source venv/bin/activate,
-    deactivate  
+    - python3 -m venv venv,
+    - source venv/bin/activate,
+    - deactivate  
 
 2. Kill FastAPI port 
-    lsof -i :8000,
-    kill -9 (port number)
+    - lsof -i :8000,
+    - kill -9 (port number)
+
+3. Start backend server
+    - fastapi dev main.py
+
+4. Start frontend server
+    - npm run dev
 
 
 Notes and project workflow:
@@ -122,3 +128,101 @@ Day 2 Backend:
                             |
                             v
                     [User / Frontend]
+
+-----------------------------------------------------------------------------------------------------------------------------
+Day 3 Frontend:
+
+*** Only task accomplished for backend :: adding CORS *** Backend port http://localhost:8000, frontend port http://localhost:5173.  Need cross origin for API calls between ports.
+
+Implemented the React frontend for the Food Logging App that interacts with the FastAPI backend. The main functionalities completed include:
+
+Food Search Page
+    - Users can type a query (e.g., “steak” or “apple”) to search for foods.
+    - The frontend calls the FastAPI backend /foods/search endpoint.
+    - The response is displayed as a list of Food Cards, each showing: food description, nutrient list (name + value)
+    - Clicking a Food Card adds the item to the Food Log and navigates to the Food Log page.
+Food Log Page
+    - Displays all foods added from searches.
+    - Each item shows nutrients and has a Remove button to delete the item from the log.
+    - The log is managed globally via React Context and a custom hook useFoodLog.
+Context & State Management
+    - Created a FoodLogContext for global state.
+    - Implemented FoodLogProvider to manage adding and removing foods.
+    - Created useFoodLog hook for convenient access in any component.
+TypeScript Integration
+    - Defined types for FoodItem and FoodNutrient.
+    - Mapped backend API responses to frontend types.
+    - Ensured removeFood and addFood are strongly typed to avoid runtime errors.
+
+                        [User / Frontend]
+                            |
+                            |  Enters search query (e.g., "steak")
+                            v
+                    -------------------------
+                    |       FoodSearch.tsx  |
+                    |-----------------------|
+                    | - Handles input       |
+                    | - Calls searchFoods() |
+                    |   from foodApi.ts     |
+                    | - Stores result in    |
+                    |   local state (foods) |
+                    -------------------------
+                            |
+                            v
+                    -------------------------
+                    |      foodApi.ts       |
+                    |-----------------------|
+                    | - Calls FastAPI backend|
+                    |   /foods/search       |
+                    | - Receives JSON list  |
+                    | - Maps raw API data   |
+                    |   to FoodItem type    |
+                    -------------------------
+                            |
+                            v
+                    -------------------------
+                    |     FoodCard.tsx      |
+                    |-----------------------|
+                    | - Displays food info  |
+                    | - Shows nutrients     |
+                    | - On click:           |
+                    |   - Adds item to log  |
+                    |     via useFoodLog()  |
+                    |   - Navigates to      |
+                    |     /food-log page    |
+                    -------------------------
+                            |
+                            v
+                    -------------------------
+                    |      FoodLog.tsx      |
+                    |-----------------------|
+                    | - Uses useFoodLog()   |
+                    |   to get log state    |
+                    | - Displays all foods  |
+                    |   added so far        |
+                    | - Remove button calls |
+                    |   removeFood(fdcId)   |
+                    -------------------------
+                            |
+                            v
+                    [User / Frontend]
+
+Key feature implemented:
+| Feature                    | Description                                                                              |
+| -------------------------- | ---------------------------------------------------------------------------------------- |
+| **Search Foods**           | Users can type a food query; API response is mapped to FoodItem and displayed in a list. |
+| **Food Cards**             | Clickable cards show description + nutrients; click adds to log.                         |
+| **Food Log Page**          | Displays all foods in the log; supports removing items.                                  |
+| **Context & Hook**         | Global state management via `FoodLogContext` + `useFoodLog`.                             |
+| **TypeScript Type Safety** | Strict types for API response mapping and context functions.                             |
+| **Navigation**             | React Router navigates between search page and food log page.   
+
+| Challenge                                      | How It Was Solved                                                                                                                                                                             |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Context fast refresh issues**                | Originally, `FoodLogContext` and `FoodLogProvider` were in the same file, which caused state loss on hot reload. Fixed by separating them into `FoodLogContext.ts` and `FoodLogProvider.tsx`. |
+| **`removeFood` not recognized by TypeScript**  | Fixed by updating the `FoodLogContextType` interface to include `removeFood` and ensuring it was provided in `FoodLogProvider`'s value.                                                       |
+| **Mapping API response types safely**          | Created `RawFoodItem` and `RawFoodNutrient` types, then mapped them to `FoodItem` and `FoodNutrient` to avoid `any` type usage.                                                               |
+| **Navigating after adding a food**             | Added `useNavigate` inside `FoodCard` to automatically redirect to `/food-log`.                                                                                                               |
+| **Frontend-port conflicts / local dev issues** | Ensured Vite frontend runs on a different port from FastAPI (usually 5173) and enabled CORS on backend if needed.                                                                             |
+| **Fast Refresh / TypeScript errors**           | Splitting context, provider, and hook into separate files solved React Fast Refresh issues.                                                                                                   |
+                         |

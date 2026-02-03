@@ -12,9 +12,18 @@ Responsibilities:
 from typing import Union
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from app.api.foods import get_food_product_barcode, search_foods
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # for dev only, allow your frontend origin in prod
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/product/{code}")
 def get_products_barcode(code):
